@@ -1,1 +1,1 @@
-from .models import classifier
+from .models import Classifier
