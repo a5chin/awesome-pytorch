@@ -3,7 +3,7 @@ import torch.nn as nn
 from typing import List
 
 
-class Model(nn.Module):
+class Classifier(nn.Module):
 	def __init__(
 		self,
 		layers: List,
