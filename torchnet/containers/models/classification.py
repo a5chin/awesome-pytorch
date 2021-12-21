@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 from typing import List
@@ -42,6 +43,8 @@ class Classifier(nn.Module):
 			eval(f'nn.{act_fin}')(dim=1)
 		)
 
-	def forward(self, x):
+	def forward(self, *x):
+		x = torch.stack(list(x))
+		x = x.type(torch.FloatTensor)
 		x = x.view(-1, self.in_features)
 		return self.fc(x)

@@ -30,6 +30,17 @@ class TorchNet:
 
 				for _, data in pbar:
 					items, target = data
+					item = items.values()
+					target = target.view(-1, 1).type(torch.FloatTensor)
+
+					self.optimizer.zero_grad()
+
+					preds = model(*item)
+					loss = self.criterion(preds, target)
+
+					loss.backward()
+					self.optimizer.step()
+					print(loss)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
@@ -104,3 +115,12 @@ class TorchNet:
 
 		elif classname.find('Embedding') != -1:
 			nn.init.kaiming_uniform_(a=2, mode='fan_in', nonlinearity='leaky_relu', tensor=m.weight)
+
+
+import pandas as pd
+
+torchnet = TorchNet()
+model = torchnet.create_model(layers=[7, 3, 1])
+df = pd.read_csv('torchnet/data/train.csv')
+torchnet.set_data(data=df, target='Survived', ignore_features=['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked'])
+torchnet.train(model)
