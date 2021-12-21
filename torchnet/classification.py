@@ -117,8 +117,6 @@ class TorchNet:
 			nn.init.kaiming_uniform_(a=2, mode='fan_in', nonlinearity='leaky_relu', tensor=m.weight)
 
 
-import pandas as pd
-
 torchnet = TorchNet()
 model = torchnet.create_model(layers=[7, 3, 1])
 df = pd.read_csv('torchnet/data/train.csv')
