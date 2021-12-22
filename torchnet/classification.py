@@ -4,7 +4,7 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from tqdm import tqdm
-from typing import List, Optional
+from typing import List
 
 from containers import Classifier, ClfDataset
 
@@ -35,13 +35,12 @@ class TorchNet:
 
 					self.optimizer.zero_grad()
 
-					out = model(*item)
-					loss = self.criterion(out, target)
+					preds = model(*item)
+					loss = self.criterion(preds, target)
 
 					loss.backward()
 					self.optimizer.step()
 
-					preds = out.detach().numpy().argmax(axis=1)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
