@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
 from torch import nn, optim
+from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from tqdm import tqdm
 from typing import List, Optional
@@ -31,7 +32,6 @@ class TorchNet:
 				for _, data in pbar:
 					items, target = data
 					item = items.values()
-					target = target.view(-1, 1).type(torch.FloatTensor)
 
 					self.optimizer.zero_grad()
 
@@ -40,7 +40,6 @@ class TorchNet:
 
 					loss.backward()
 					self.optimizer.step()
-					print(loss)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
@@ -118,7 +117,7 @@ class TorchNet:
 
 
 torchnet = TorchNet()
-model = torchnet.create_model(layers=[7, 3, 1])
+model = torchnet.create_model(layers=[6, 3, 2])
 df = pd.read_csv('torchnet/data/train.csv')
-torchnet.set_data(data=df, target='Survived', ignore_features=['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked'])
+torchnet.set_data(data=df, target='Survived', ignore_features=['Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
 torchnet.train(model)
