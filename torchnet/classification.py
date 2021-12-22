@@ -35,11 +35,14 @@ class TorchNet:
 
 					self.optimizer.zero_grad()
 
-					preds = model(*item)
-					loss = self.criterion(preds, target)
+					out = model(*item)
+					loss = self.criterion(out, target)
 
 					loss.backward()
 					self.optimizer.step()
+
+					preds = out.detach().numpy().argmax(axis=1)
+					print(preds)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
@@ -69,6 +72,7 @@ class TorchNet:
 	@staticmethod
 	def create_model(
 		layers: List,
+		bn: str=True,
 		act_fn: str='LeakyReLU',
 		dropout: float=0.2,
 		act_fin: str='Softmax',
@@ -80,7 +84,8 @@ class TorchNet:
 			dropout=dropout,
 			act_fin=act_fin
 		)
-		model.apply(TorchNet.init_weights)
+		if init_weights:
+			model.apply(TorchNet.init_weights)
 		return model
 
 
@@ -117,7 +122,7 @@ class TorchNet:
 
 
 torchnet = TorchNet()
-model = torchnet.create_model(layers=[6, 3, 2])
+model = torchnet.create_model(layers=[6, 5, 4, 3, 2])
 df = pd.read_csv('torchnet/data/train.csv')
 torchnet.set_data(data=df, target='Survived', ignore_features=['Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
 torchnet.train(model)
