@@ -1,8 +1,7 @@
 import pandas as pd
 import torch
 from torch import nn, optim
-from torch.nn import functional as F
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 from typing import List
 
@@ -17,7 +16,7 @@ class TorchNet:
 		optimizer: str='SGD',
 		criterion: str='CrossEntropyLoss',
 		total_epoch: int=20,
-	):
+	) -> None:
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 		self.optimizer = eval(f'optim.{optimizer}')(model.parameters(), lr=lr)
 		self.criterion = eval(f'nn.{criterion}')()
@@ -31,16 +30,24 @@ class TorchNet:
 
 				for _, data in pbar:
 					items, target = data
-					item = items.values()
+					items = items.values()
 
 					self.optimizer.zero_grad()
 
-					preds = model(*item)
+					preds = model(*items)
 					loss = self.criterion(preds, target)
 
 					loss.backward()
 					self.optimizer.step()
 
+	def evaluate(self, model: nn.Module, dataloader: DataLoader=None):
+		dataloader = self.val_dataloader if dataloader == None else dataloader
+		model.eval
+		with torch.inference_mode():
+			for data in dataloader:
+				items, target = data
+				items = items.values()
+				preds = model(*items)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
