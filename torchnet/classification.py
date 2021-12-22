@@ -42,7 +42,6 @@ class TorchNet:
 					self.optimizer.step()
 
 					preds = out.detach().numpy().argmax(axis=1)
-					print(preds)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
