@@ -6,9 +6,12 @@ from tqdm import tqdm
 from typing import List
 
 from containers import Classifier, ClfDataset
+from containers import Metrics
 
 
 class TorchNet:
+	def __init__(self) -> None:
+		self.metrics = Metrics()
 	def train(
 		self,
 		model: nn.Module,
@@ -39,6 +42,8 @@ class TorchNet:
 
 					loss.backward()
 					self.optimizer.step()
+
+					self.metrics.accuracy(preds, target)
 
 	def evaluate(self, model: nn.Module, dataloader: DataLoader=None):
 		dataloader = self.val_dataloader if dataloader == None else dataloader

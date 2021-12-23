@@ -20,7 +20,7 @@ class Classifier(nn.Module):
 		self.bn = True
 		self.dropout = dropout
 		self.act_fn = act_fn
-		self.act_fin = eval(f'nn.{act_fin}')(dim=1)
+		self.act_fin = eval(f'nn.{act_fin}')(dim=-1)
 
 		self.fc = nn.Sequential()
 		for i in range(len(layers) - 2):
