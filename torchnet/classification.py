@@ -43,9 +43,11 @@ class TorchNet:
 					loss.backward()
 					self.optimizer.step()
 
-					self.metrics.accuracy(preds, target)
+					acc = self.metrics.accuracy(preds, target)
+					recall = self.metrics.recall(preds, target)
+					precision = self.metrics.precision(preds, target)
 
-	def evaluate(self, model: nn.Module, dataloader: DataLoader=None):
+	def evaluate(self, model: nn.Module, dataloader: DataLoader=None) -> None:
 		dataloader = self.val_dataloader if dataloader == None else dataloader
 		model.eval
 		with torch.inference_mode():
@@ -53,6 +55,10 @@ class TorchNet:
 				items, target = data
 				items = items.values()
 				preds = model(*items)
+
+				acc = self.metrics.accuracy(preds, target)
+				recall = self.metrics.recall(preds, target)
+				precision = self.metrics.precision(preds, target)
 
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
 		dataset = ClfDataset(
