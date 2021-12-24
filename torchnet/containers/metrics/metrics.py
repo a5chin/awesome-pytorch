@@ -33,6 +33,12 @@ class Metrics:
             precision += self.matrix[i, i] / (self.matrix[:, i].sum() + self.eps)
         return precision / len(self.matrix)
 
+    def f1_score(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
+        self.setup(preds, target)
+        recall = self.recall(preds, target)
+        precision = self.precision(preds, target)
+        return 2 * precision * recall / (precision + recall)
+
     def _compute_matrix(self, th: float) -> torch.Tensor:
         preds = self.preds
         dim = preds.ndim
