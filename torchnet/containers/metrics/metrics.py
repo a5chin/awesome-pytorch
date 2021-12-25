@@ -23,7 +23,7 @@ class Metrics:
         recall = 0
         for i in range(len(self.matrix)):
             recall += self.matrix[i, i] / (self.matrix[i, :].sum() + self.eps)
-        return recall / len(self.matrix)
+        return recall.item() / len(self.matrix)
 
     def precision(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
         self.setup(preds, target)
@@ -31,7 +31,7 @@ class Metrics:
         precision = 0
         for i in range(len(self.matrix)):
             precision += self.matrix[i, i] / (self.matrix[:, i].sum() + self.eps)
-        return precision / len(self.matrix)
+        return precision.item() / len(self.matrix)
 
     def f1_score(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
         self.setup(preds, target)

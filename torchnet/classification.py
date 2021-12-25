@@ -1,9 +1,13 @@
+import re
 import pandas as pd
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader, random_split
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from typing import List
+from collections import OrderedDict
+from pathlib import Path
+from typing import Optional, List
 
 from containers import Classifier, ClfDataset
 from containers import Metrics
@@ -12,6 +16,13 @@ from containers import Metrics
 class TorchNet:
 	def __init__(self) -> None:
 		self.metrics = Metrics()
+		self.log_dir = Path('logs')
+		self.ckpt = Path('ckpt')
+		self.ckpt.mkdir(exist_ok=True)
+		self.best_acc = 0.0
+		self.train_writer = SummaryWriter(log_dir=self.log_dir / 'train')
+		self.val_writer = SummaryWriter(log_dir=self.log_dir / 'val')
+
 	def train(
 		self,
 		model: nn.Module,
@@ -25,7 +36,8 @@ class TorchNet:
 		self.criterion = eval(f'nn.{criterion}')()
 
 		for epoch in range(total_epoch):
-			total, train_loss, train_acc = 0, 0.0, 0.0
+			total, train_loss = 0, 0.0
+			accuracy, recall, precision = 0.0, 0.0, 0.0
 			model.train()
 
 			with tqdm(enumerate(self.train_dataloader, 0), total=len(self.train_dataloader)) as pbar:
@@ -43,24 +55,48 @@ class TorchNet:
 					loss.backward()
 					self.optimizer.step()
 
-					acc = self.metrics.accuracy(preds, target)
-					recall = self.metrics.recall(preds, target)
-					precision = self.metrics.precision(preds, target)
+					total += self.batch_size
+					train_loss += loss.item() * self.batch_size
+					accuracy += self.metrics.accuracy(preds, target) * self.batch_size
+					recall += self.metrics.recall(preds, target) * self.batch_size
+					precision += self.metrics.precision(preds, target) * self.batch_size
 
-	def evaluate(self, model: nn.Module, dataloader: DataLoader=None) -> None:
+					pbar.set_postfix(
+						OrderedDict(Loss=train_loss / total, Accuracy=accuracy / total, Recall=recall / total, Precision=precision / total)
+					)
+
+				self.train_writer.add_scalar('loss', train_loss / total, epoch)
+				self.train_writer.add_scalar('accuracy', accuracy / total, epoch)
+				self.train_writer.add_scalar('recall', recall / total, epoch)
+				self.train_writer.add_scalar('precision', precision / total, epoch)
+
+			self.evaluate(model=model, epoch=epoch)
+
+	def evaluate(self, model: nn.Module, dataloader: DataLoader=None, epoch: Optional[int]=None) -> None:
+		accuracy, recall, precision = 0.0, 0.0, 0.0
 		dataloader = self.val_dataloader if dataloader == None else dataloader
-		model.eval
+		model.eval()
 		with torch.inference_mode():
 			for data in dataloader:
 				items, target = data
 				items = items.values()
 				preds = model(*items)
 
-				acc = self.metrics.accuracy(preds, target)
+				accuracy = self.metrics.accuracy(preds, target)
 				recall = self.metrics.recall(preds, target)
 				precision = self.metrics.precision(preds, target)
 
+			if epoch != None:
+				self.train_writer.add_scalar('accuracy', accuracy, epoch)
+				self.train_writer.add_scalar('recall', recall, epoch)
+				self.train_writer.add_scalar('precision', precision, epoch)
+
+				if self.best_acc < accuracy:
+					self.best_acc = accuracy
+					torch.save(model.state_dict(), self.ckpt / Path('best_ckpt.pth'))
+
 	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
+		self.batch_size = batch_size
 		dataset = ClfDataset(
 			data=data,
 			target=target,
@@ -81,7 +117,7 @@ class TorchNet:
 		)
 		self.val_dataloader = DataLoader(
 			dataset=val_dataset,
-			batch_size=1,
+			batch_size=len_val,
 			shuffle=False
 		)
 
@@ -138,7 +174,7 @@ class TorchNet:
 
 
 torchnet = TorchNet()
-model = torchnet.create_model(layers=[6, 5, 4, 3, 2])
+model = torchnet.create_model(layers=[5, 4, 3, 2])
 df = pd.read_csv('torchnet/data/train.csv')
-torchnet.set_data(data=df, target='Survived', ignore_features=['Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
-torchnet.train(model)
+torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
+torchnet.train(model, total_epoch=50)

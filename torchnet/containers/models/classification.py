@@ -47,7 +47,7 @@ class Classifier(nn.Module):
 		)
 
 	def forward(self, *x):
-		x = torch.stack(list(x)).type(torch.FloatTensor)
+		x = torch.stack(x).type(torch.FloatTensor)
 		x = x.view(-1, self.in_features)
 		x = self.fc(x)
 		return self.act_fin(x)
