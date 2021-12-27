@@ -174,7 +174,7 @@ class TorchNet:
 
 
 torchnet = TorchNet()
-model = torchnet.create_model(layers=[5, 4, 3, 2])
+model = torchnet.create_model(layers=[5, 32, 256, 1024, 256, 32, 16, 2])
 df = pd.read_csv('torchnet/data/train.csv')
 torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
-torchnet.train(model, total_epoch=50)
+torchnet.train(model, total_epoch=100)

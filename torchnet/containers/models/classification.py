@@ -17,7 +17,7 @@ class Classifier(nn.Module):
 
 		self.in_features = layers[0]
 		self.num_classes = layers[-1]
-		self.bn = True
+		self.bn = bn
 		self.dropout = dropout
 		self.act_fn = act_fn
 		self.act_fin = eval(f'nn.{act_fin}')(dim=-1)
