@@ -22,6 +22,10 @@ class ClfDataset(Dataset):
 		self.targets = data[target]
 		self.ignore_features = ignore_features
 
+	# TODO: Normalization
+	def normalize(self, data):
+		return data
+
 	def __getitem__(self, index):
 		data = self.data
 		target = self.targets[index]
