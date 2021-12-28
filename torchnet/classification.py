@@ -37,7 +37,7 @@ class TorchNet:
 
 		for epoch in range(total_epoch):
 			total, train_loss = 0, 0.0
-			accuracy, recall, precision = 0.0, 0.0, 0.0
+			accuracy = recall = precision = 0.0
 			model.train()
 
 			with tqdm(enumerate(self.train_dataloader, 0), total=len(self.train_dataloader)) as pbar:
