@@ -17,13 +17,14 @@ class ClfDataset(Dataset):
 		targets = data.groupby(target)
 		data[target] = targets.ngroup()
 		self.num_classes = targets.ngroups
-		self.data = data.drop(columns=ignore_features)
+		data = data.drop(columns=ignore_features)
+		self.data = self.normalize(data)
 		self.target = target
 		self.targets = data[target]
 		self.ignore_features = ignore_features
 
 	# TODO: Normalization
-	def normalize(self, data):
+	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
 		return data
 
 	def __getitem__(self, index):
