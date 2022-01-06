@@ -1,9 +1,8 @@
-import numpy as np
 import pandas as pd
 import torch
 from torch.nn import functional as F
-from torch.utils.data import Dataset, DataLoader
-from typing import Union, List
+from torch.utils.data import Dataset
+from typing import Tuple, List
 
 
 class ClfDataset(Dataset):
@@ -27,12 +26,12 @@ class ClfDataset(Dataset):
 	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
 		return data
 
-	def __getitem__(self, index):
+	def __getitem__(self, index: int) -> Tuple[pd.DataFrame, torch.FloatTensor]:
 		data = self.data
 		target = self.targets[index]
 		target = torch.as_tensor(target)
 		target = F.one_hot(target, num_classes=self.num_classes)
 		return {column: data[column][index] for column in data.columns}, target.type(torch.FloatTensor)
 
-	def __len__(self):
+	def __len__(self) -> int:
 		return len(self.data)
