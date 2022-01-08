@@ -1,6 +1,6 @@
-import pandas as pd
 import torch
 from torch import nn, optim
+from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
@@ -27,11 +27,17 @@ class TorchNet:
 		model: nn.Module,
 		lr: float=1e-3,
 		optimizer: str='SGD',
+		scheduler: str='OneCycleLR',
 		criterion: str='CrossEntropyLoss',
 		total_epoch: int=20,
 	) -> None:
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 		self.optimizer = eval(f'optim.{optimizer}')(model.parameters(), lr=lr)
+		self.scheduler = eval(f'lr_scheduler.{scheduler}')(
+			optimizer=optimizer,
+			max_lr=lr,
+			toral_steps=len(self.train_dataloader),
+		)
 		self.criterion = eval(f'nn.{criterion}')()
 
 		for epoch in range(total_epoch):
@@ -70,6 +76,7 @@ class TorchNet:
 				self.train_writer.add_scalar('precision', precision / total, epoch)
 
 			self.evaluate(model=model, epoch=epoch)
+			self.scheduler.step()
 
 	def evaluate(self, model: nn.Module, dataloader: DataLoader=None, epoch: Optional[int]=None) -> None:
 		accuracy, recall, precision = 0.0, 0.0, 0.0
@@ -171,6 +178,8 @@ class TorchNet:
 		elif classname.find('Embedding') != -1:
 			nn.init.kaiming_uniform_(a=2, mode='fan_in', nonlinearity='leaky_relu', tensor=m.weight)
 
+
+import pandas as pd
 
 torchnet = TorchNet()
 model = torchnet.create_model(layers=[5, 32, 256, 1024, 256, 32, 8, 2])
