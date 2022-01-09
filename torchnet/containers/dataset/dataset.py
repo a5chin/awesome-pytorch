@@ -27,9 +27,9 @@ class ClfDataset(Dataset):
 	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
 		for name in data:
 			d = data[name][0]
-			if isinstance(d, np.int32):
+			if isinstance(d, np.float32) or isinstance(d, str):
 				numeric = True
-			elif isinstance(d, np.float32) or isinstance(d, str):
+			else:
 				numeric = False
 		return data
 
