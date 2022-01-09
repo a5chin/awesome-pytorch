@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import torch
 from torch.nn import functional as F
@@ -24,6 +25,12 @@ class ClfDataset(Dataset):
 
 	# TODO: Normalization
 	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
+		for name in data:
+			d = data[name][0]
+			if isinstance(d, np.int32):
+				numeric = True
+			elif isinstance(d, np.float32) or isinstance(d, str):
+				numeric = False
 		return data
 
 	def __getitem__(self, index: int) -> Tuple[pd.DataFrame, torch.FloatTensor]:
