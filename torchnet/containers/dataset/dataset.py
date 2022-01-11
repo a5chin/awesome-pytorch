@@ -22,7 +22,7 @@ class ClfDataset(Dataset):
 		self.targets = data[target]
 		self.ignore_features = ignore_features
 
-	# TODO: Normalization
+	# TODO: Normalizations
 	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
 		return data
 
