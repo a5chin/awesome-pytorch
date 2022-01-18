@@ -12,7 +12,7 @@ class ClfDataset(Dataset):
 		data: pd,
 		target: str,
 		ignore_features: List=[],
-	):
+	) -> None:
 		super().__init__()
 		targets = data.groupby(target)
 		data[target] = targets.ngroup()

@@ -1,3 +1,4 @@
+import pandas as pd
 import torch
 from torch import nn, optim
 from torch.optim import lr_scheduler
@@ -101,7 +102,7 @@ class TorchNet:
 					self.best_acc = accuracy
 					torch.save(model.state_dict(), self.ckpt / Path('best_ckpt.pth'))
 
-	def set_data(self, data, target, ignore_features=[], ratio=0.8, batch_size=32) -> None:
+	def set_data(self, data: pd.DataFrame, target: str, ignore_features: List=[], ratio: float=0.8, batch_size: int=32) -> None:
 		self.batch_size = batch_size
 		dataset = ClfDataset(
 			data=data,
@@ -178,8 +179,6 @@ class TorchNet:
 		elif classname.find('Embedding') != -1:
 			nn.init.kaiming_uniform_(a=2, mode='fan_in', nonlinearity='leaky_relu', tensor=m.weight)
 
-
-import pandas as pd
 
 torchnet = TorchNet()
 model = torchnet.create_model(layers=[5, 32, 256, 1024, 256, 32, 8, 2])
