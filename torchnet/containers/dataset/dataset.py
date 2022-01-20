@@ -12,7 +12,7 @@ class ClfDataset(Dataset):
 		data: pd,
 		target: str,
 		ignore_features: List=[],
-	):
+	) -> None:
 		super().__init__()
 		targets = data.groupby(target)
 		data[target] = targets.ngroup()
@@ -27,8 +27,9 @@ class ClfDataset(Dataset):
 	def normalize(self, data: pd.DataFrame) -> pd.DataFrame:
 		for name in data:
 			d = data[name][0]
-			if isinstance(d, np.float32) or isinstance(d, str):
+			if isinstance(d, np.int64) or isinstance(d, str):
 				numeric = True
+				data[name] = data.groupby(name).ngroup()
 			else:
 				numeric = False
 		return data
