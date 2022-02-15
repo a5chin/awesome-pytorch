@@ -11,7 +11,7 @@ pip install -r requirements.txt
 torchnet = TorchNet()
 model = torchnet.create_model(layers=[5, 8, 10, 12, 10, 8, 4, 1])
 ```
-<img alt="assets/images/nn.svg" src="assets/images/nn.svg" style="width: 600px; height: 200px; object-fit: cover"></img>
+<img alt="assets/images/nn.svg" src="assets/images/nn.svg" width="100%"></img>
 
 ### Set Data
 ```python
