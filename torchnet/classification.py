@@ -31,13 +31,13 @@ class TorchNet:
 		scheduler: str='OneCycleLR',
 		criterion: str='CrossEntropyLoss',
 		total_epoch: int=20,
-	) -> None:
+	) -> nn.Module:
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 		self.optimizer = eval(f'optim.{optimizer}')(model.parameters(), lr=lr)
 		self.scheduler = eval(f'lr_scheduler.{scheduler}')(
-			optimizer=optimizer,
+			optimizer=self.optimizer,
 			max_lr=lr,
-			toral_steps=len(self.train_dataloader),
+			total_steps=len(self.train_dataloader),
 		)
 		self.criterion = eval(f'nn.{criterion}')()
 
@@ -68,7 +68,12 @@ class TorchNet:
 					precision += self.metrics.precision(preds, target) * self.batch_size
 
 					pbar.set_postfix(
-						OrderedDict(Loss=train_loss / total, Accuracy=accuracy / total, Recall=recall / total, Precision=precision / total)
+						OrderedDict(
+							Loss=train_loss / total,
+							Accuracy=accuracy / total,
+							Recall=recall / total,
+							Precision=precision / total
+						)
 					)
 
 				self.train_writer.add_scalar('loss', train_loss / total, epoch)
@@ -78,8 +83,17 @@ class TorchNet:
 
 			self.evaluate(model=model, epoch=epoch)
 			self.scheduler.step()
+		model.load_state_dict(
+			torch.load(self.ckpt / 'best_ckpt.pth'), strict=False
+		)
+		return model
 
-	def evaluate(self, model: nn.Module, dataloader: DataLoader=None, epoch: Optional[int]=None) -> None:
+	def evaluate(
+		self,
+		model: nn.Module,
+		dataloader: DataLoader=None,
+		epoch: Optional[int]=None
+	) -> None:
 		accuracy, recall, precision = 0.0, 0.0, 0.0
 		dataloader = self.val_dataloader if dataloader == None else dataloader
 		model.eval()
@@ -100,9 +114,16 @@ class TorchNet:
 
 				if self.best_acc < accuracy:
 					self.best_acc = accuracy
-					torch.save(model.state_dict(), self.ckpt / Path('best_ckpt.pth'))
+					torch.save(model.state_dict(), self.ckpt / 'best_ckpt.pth')
 
-	def set_data(self, data: pd.DataFrame, target: str, ignore_features: List=[], ratio: float=0.8, batch_size: int=32) -> None:
+	def set_data(
+		self,
+		data: pd.DataFrame,
+		target: str,
+		ignore_features: List=[],
+		ratio: float=0.8,
+		batch_size: int=32
+	) -> None:
 		self.batch_size = batch_size
 		dataset = ClfDataset(
 			data=data,
@@ -182,6 +203,6 @@ class TorchNet:
 
 torchnet = TorchNet()
 model = torchnet.create_model(layers=[5, 32, 256, 1024, 256, 32, 8, 2])
-df = pd.read_csv('torchnet/data/train.csv')
+df = pd.read_csv('data/train.csv')
 torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
-torchnet.train(model, total_epoch=100)
+trained_model = torchnet.train(model, total_epoch=100)
