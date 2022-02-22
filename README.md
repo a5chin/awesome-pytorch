@@ -15,8 +15,12 @@ model = torchnet.create_model(layers=[5, 8, 10, 12, 10, 8, 4, 1])
 
 ### Set Data
 ```python
-df = pd.read_csv('torchnet/data/train.csv')
-torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
+df = pd.read_csv('assets/data/train.csv')
+torchnet.set_data(
+    data=df,
+    target='Survived',
+    ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked']
+)
 ```
 - target
    - The Value to predict in header
@@ -25,5 +29,5 @@ torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'N
 
 ### Train Model
 ```python
-torchnet.train(model, total_epoch=100)
+trained_model = torchnet.train(model, total_epoch=100)
 ```
