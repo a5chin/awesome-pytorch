@@ -146,7 +146,8 @@ class TorchNet:
 		self.val_dataloader = DataLoader(
 			dataset=val_dataset,
 			batch_size=len_val,
-			shuffle=False
+			shuffle=False,
+			drop_last=True
 		)
 
 	@staticmethod
