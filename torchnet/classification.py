@@ -200,10 +200,3 @@ class TorchNet:
 
 		elif classname.find('Embedding') != -1:
 			nn.init.kaiming_uniform_(a=2, mode='fan_in', nonlinearity='leaky_relu', tensor=m.weight)
-
-
-torchnet = TorchNet()
-model = torchnet.create_model(layers=[5, 32, 256, 1024, 256, 32, 8, 2])
-df = pd.read_csv('data/train.csv')
-torchnet.set_data(data=df, target='Survived', ignore_features=['PassengerId', 'Name', 'Sex', 'Age', 'Ticket', 'Cabin', 'Embarked'])
-trained_model = torchnet.train(model, total_epoch=100)
