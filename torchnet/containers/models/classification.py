@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from typing import List
+from typing import Tuple, List, OrderedDict
 
 
 class Classifier(nn.Module):
@@ -11,7 +11,7 @@ class Classifier(nn.Module):
 		act_fn: str='LeakyReLU',
 		bn: str=True,
 		dropout: float=0.2,
-		act_fin: str='Softmax'
+		act_fin: str='LogSoftmax'
 	) -> None:
 		super().__init__()
 
@@ -22,32 +22,41 @@ class Classifier(nn.Module):
 		self.act_fn = act_fn
 		self.act_fin = eval(f'nn.{act_fin}')(dim=-1)
 
-		self.fc = nn.Sequential()
-		for i in range(len(layers) - 2):
-			self.fc.add_module(
-				f'fc{i}',
-				nn.Linear(layers[i], layers[i + 1])
-			)
-			if self.bn:
-				self.fc.add_module(
-					f'bn{i}',
-					nn.BatchNorm1d(layers[i + 1])
-				)
-			self.fc.add_module(
-				f'act_fn{i}',
-				eval(f'nn.{act_fn}')()
-			)
-			self.fc.add_module(
-				f'dropout{i}',
-				nn.Dropout(self.dropout)
-			)
+		in_features, out_features = layers[: -2], layers[1: -1]
+		unit = [
+			Unit(i, o, self.dropout, act_fn) for i, o in zip(in_features, out_features)
+		]
+
+		self.fc = nn.Sequential(*unit)
 		self.fc.add_module(
-			f'fc{i + 1}',
-			nn.Linear(layers[-2], layers[-1])
+			'fc_classes',
+			nn.Linear(layers[-2], self.num_classes)
 		)
 
-	def forward(self, *x):
+	def forward(self, *x: Tuple) -> torch.Tensor:
 		x = torch.stack(x).type(torch.FloatTensor)
 		x = x.view(-1, self.in_features)
 		x = self.fc(x)
 		return self.act_fin(x)
+
+
+class Unit(nn.Module):
+	def __init__(
+		self,
+		in_features: int,
+		out_features: int,
+		dropout: float,
+		act_fn: str
+	) -> None:
+		super().__init__()
+		self.fc = nn.Sequential(
+			OrderedDict([
+				('fc', nn.Linear(in_features, out_features)),
+				('bn', nn.BatchNorm1d(out_features)),
+				('act_fn', eval(f'nn.{act_fn}')()),
+				('dropout', nn.Dropout(dropout))
+			])
+		)
+
+	def forward(self, x: torch.Tensor):
+		return self.fc(x)
