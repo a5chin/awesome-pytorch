@@ -5,9 +5,8 @@ from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from collections import OrderedDict
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, OrderedDict
 
 from containers import Classifier, ClfDataset
 from containers import Metrics
@@ -29,7 +28,7 @@ class TorchNet:
 		lr: float=1e-3,
 		optimizer: str='SGD',
 		scheduler: str='OneCycleLR',
-		criterion: str='CrossEntropyLoss',
+		criterion: str='NLLLoss',
 		total_epoch: int=20,
 	) -> nn.Module:
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -81,8 +80,10 @@ class TorchNet:
 				self.train_writer.add_scalar('recall', recall / total, epoch)
 				self.train_writer.add_scalar('precision', precision / total, epoch)
 
-			self.evaluate(model=model, epoch=epoch)
+			self.evaluate(model, epoch)
+
 			self.scheduler.step()
+
 		model.load_state_dict(
 			torch.load(self.ckpt / 'best_ckpt.pth'), strict=False
 		)
@@ -156,7 +157,7 @@ class TorchNet:
 		bn: str=True,
 		act_fn: str='LeakyReLU',
 		dropout: float=0.2,
-		act_fin: str='Softmax',
+		act_fin: str='LogSoftmax',
 		init_weights: bool=True
 	) -> nn.Module:
 		model = Classifier(
