@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from codecs import open
 
-exec(open("torchnet/version.py").read())
+exec(open("torchnet/version").read())
 setup(
     name="torchnet",
     version=__version__,
