@@ -8,8 +8,8 @@ from tqdm import tqdm
 from pathlib import Path
 from typing import Optional, List, OrderedDict
 
-from containers import Classifier, ClfDataset
-from containers import Metrics
+from .containers import Classifier, ClfDataset
+from .containers import Metrics
 
 
 class TorchNet:
