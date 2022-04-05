@@ -9,7 +9,6 @@ class Classifier(nn.Module):
 		self,
 		layers: List,
 		act_fn: str='LeakyReLU',
-		bn: str=True,
 		dropout: float=0.2,
 		act_fin: str='LogSoftmax'
 	) -> None:
@@ -17,7 +16,6 @@ class Classifier(nn.Module):
 
 		self.in_features = layers[0]
 		self.num_classes = layers[-1]
-		self.bn = bn
 		self.dropout = dropout
 		self.act_fn = act_fn
 		self.act_fin = eval(f'nn.{act_fin}')(dim=-1)
