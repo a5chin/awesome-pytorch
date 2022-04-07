@@ -1,8 +1,12 @@
 # Usage
 ## Installation
 
-```zsh
+```sh
 pip install -r requirements.txt
+```
+or
+```sh
+pip install git+https://github.com/a5chin/awesome-pytorch
 ```
 
 ## Classification
