@@ -1,0 +1,41 @@
+name: Linting
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install formatter
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 pydocstyle toml
+
+    - name: Test with black
+      run: |
+        black --check ./torchnet/ ./tests/
+
+    - name: Test with isort
+      run: |
+        isort --check ./torchnet/ ./tests/
+
+    - name: Test with flake8
+      run: |
+        flake8 ./torchnet/ ./tests/
+
+    # - name: Test with pydocstyle
+    #   run: |
+    #     pydocstyle ./torchnet/
