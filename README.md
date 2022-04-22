@@ -1,3 +1,13 @@
+<div align="center">
+
+<h1>TorchNet</h1>
+
+[![Pytest](https://github.com/a5chin/awesome-pytorch/actions/workflows/pytest.yml/badge.svg)](https://github.com/a5chin/awesome-pytorch/actions/workflows/pytest.yml) [![Linting](https://github.com/a5chin/awesome-pytorch/actions/workflows/linting.yml/badge.svg)](https://github.com/a5chin/awesome-pytorch/actions/workflows/linting.yml) [![License](https://img.shields.io/pypi/l/ansicolortags.svg)](https://img.shields.io/pypi/l/ansicolortags.svg)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](examples/classification.ipynb)
+
+</div>
+
 # Usage
 ## Installation
 
