@@ -1,4 +1,5 @@
 numpy
+pandas
+tensorboard
 torch
 tqdm
-pandas
