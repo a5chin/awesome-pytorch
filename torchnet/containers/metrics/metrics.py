@@ -11,13 +11,17 @@ class Metrics:
         out = torch.concat([args, probs], axis=1)
         self.preds, self.target = out, target
 
-    def accuracy(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
+    def accuracy(
+        self, preds: torch.Tensor, target: torch.Tensor, th: float = 0.0
+    ) -> torch.Tensor:
         self.setup(preds, target)
         self.matrix = self._compute_matrix(th)
         acc = self.matrix.diag().sum().item() / len(self.target)
         return acc
 
-    def recall(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
+    def recall(
+        self, preds: torch.Tensor, target: torch.Tensor, th: float = 0.0
+    ) -> torch.Tensor:
         self.setup(preds, target)
         self.matrix = self._compute_matrix(th)
         recall = 0
@@ -25,7 +29,9 @@ class Metrics:
             recall += self.matrix[i, i] / (self.matrix[i, :].sum() + self.eps)
         return recall.item() / len(self.matrix)
 
-    def precision(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
+    def precision(
+        self, preds: torch.Tensor, target: torch.Tensor, th: float = 0.0
+    ) -> torch.Tensor:
         self.setup(preds, target)
         self.matrix = self._compute_matrix(th)
         precision = 0
@@ -33,7 +39,9 @@ class Metrics:
             precision += self.matrix[i, i] / (self.matrix[:, i].sum() + self.eps)
         return precision.item() / len(self.matrix)
 
-    def f1_score(self, preds: torch.Tensor, target: torch.Tensor, th: float=0.0) -> torch.Tensor:
+    def f1_score(
+        self, preds: torch.Tensor, target: torch.Tensor, th: float = 0.0
+    ) -> torch.Tensor:
         self.setup(preds, target)
         recall = self.recall(preds, target)
         precision = self.precision(preds, target)
