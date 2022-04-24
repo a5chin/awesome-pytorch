@@ -4,7 +4,7 @@
 
 [![Pytest](https://github.com/a5chin/awesome-pytorch/actions/workflows/pytest.yml/badge.svg)](https://github.com/a5chin/awesome-pytorch/actions/workflows/pytest.yml) [![Linting](https://github.com/a5chin/awesome-pytorch/actions/workflows/linting.yml/badge.svg)](https://github.com/a5chin/awesome-pytorch/actions/workflows/linting.yml) [![License](https://img.shields.io/pypi/l/ansicolortags.svg)](https://img.shields.io/pypi/l/ansicolortags.svg)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](examples/classification.ipynb)
+[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/) [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](examples/classification.ipynb) [![Numpy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/) [![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/) [![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)](https://pytorch.org/)
 
 </div>
 
